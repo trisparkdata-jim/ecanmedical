@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Nós - ECAN Medical</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #2C5F4A; --secondary: #1A3B2E; --accent: #D4AF37; --light: #f5f5f5; --white: #ffffff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+        
+        header { background: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: fixed; width: 100%; z-index: 1000; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; }
+        .logo { font-size: 1.8rem; font-weight: bold; color: var(--primary); text-decoration: none; }
+        nav ul { display: flex; list-style: none; gap: 2rem; }
+        nav a { text-decoration: none; color: #333; font-weight: 500; transition: color 0.3s; }
+        nav a:hover, nav a.active { color: var(--primary); }
+        .cta-btn { background: var(--primary); color: var(--white); padding: 0.7rem 1.5rem; border-radius: 5px; text-decoration: none; font-weight: 500; }
+        
+        .breadcrumb { background: var(--light); padding: 1rem 2rem; padding-top: 5rem; }
+        .breadcrumb a { color: var(--primary); text-decoration: none; }
+        
+        .about-hero { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: var(--white); padding: 4rem 2rem; text-align: center; }
+        .about-hero h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .about-hero p { font-size: 1.3rem; max-width: 800px; margin: 0 auto; opacity: 0.9; }
+        
+        .content { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
+        
+        .section { margin-bottom: 4rem; }
+        .section h2 { font-size: 2rem; color: var(--primary); margin-bottom: 1.5rem; border-bottom: 3px solid var(--primary); padding-bottom: 0.5rem; display: inline-block; }
+        .section p { margin-bottom: 1rem; color: #666; line-height: 1.8; }
+        
+        .timeline { position: relative; padding-left: 2rem; }
+        .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--primary); }
+        .timeline-item { position: relative; margin-bottom: 2rem; padding-left: 1.5rem; }
+        .timeline-item::before { content: ''; position: absolute; left: -2.4rem; top: 0.3rem; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; }
+        .timeline-item h3 { color: var(--primary); margin-bottom: 0.5rem; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin: 3rem 0; }
+        .stat-card { text-align: center; padding: 2rem; background: var(--light); border-radius: 10px; }
+        .stat-card h3 { font-size: 2.5rem; color: var(--primary); margin-bottom: 0.5rem; }
+        
+        .cert-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin: 2rem 0; }
+        .cert-card { padding: 1.5rem; text-align: center; border: 2px solid var(--primary); border-radius: 10px; }
+        .cert-card h4 { color: var(--primary); margin-bottom: 0.5rem; }
+        
+        .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin: 2rem 0; }
+        .team-member { text-align: center; padding: 2rem; background: var(--light); border-radius: 10px; }
+        .team-member h4 { color: var(--primary); margin-bottom: 0.5rem; }
+        
+        .factory-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin: 2rem 0; }
+        .factory-img { height: 250px; background: linear-gradient(135deg, #ddd 0%, #eee 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #999; }
+        
+        footer { background: var(--secondary); color: var(--white); padding: 3rem 2rem; margin-top: 4rem; }
+        .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+        .footer-col h4 { margin-bottom: 1rem; color: var(--accent); }
+        .footer-col ul { list-style: none; }
+        .footer-col a { color: var(--white); text-decoration: none; opacity: 0.8; }
+        .footer-bottom { max-width: 1200px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; opacity: 0.7; }
+        
+        @media (max-width: 768px) {
+            .stats-grid, .cert-grid, .team-grid, .factory-gallery { grid-template-columns: 1fr 1fr; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .nav-container { flex-direction: column; gap: 0.5rem; padding: 0.8rem 1rem; }
+            nav ul { flex-direction: column; gap: 0.5rem; text-align: center; }
+            .logo { font-size: 1.4rem; }
+            .breadcrumb { padding: 4rem 1rem 1rem; }
+            .about-hero { padding: 3rem 1rem; }
+            .about-hero h1 { font-size: 1.8rem; }
+            .content { padding: 2rem 1rem; }
+            .section h2 { font-size: 1.5rem; }
+            .stat-card { padding: 1rem; }
+            .stat-card h3 { font-size: 1.5rem; }
+            .timeline { padding-left: 1rem; }
+        }
+        
+        .menu-toggle { display: none; }
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; font-size: 1.5rem; background: none; border: none; cursor: pointer; color: var(--primary); position: absolute; right: 1rem; top: 0.8rem; }
+            nav ul { display: none; }
+            nav ul.active { display: flex; }
+        }
+        
+        @media (hover: none) {
+            a:active { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">ECAN Medical</a>
+            <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="index.html#products">Produtos</a></li>
+                    <li><a href="sobre-nos.html" class="active">Sobre Nós</a></li>
+                    <li><a href="index.html#contact">Contato</a></li>
+                </ul>
+            </nav>
+            <a href="index.html#contact" class="cta-btn">Solicitar Orçamento</a>
+        </div>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="index.html">Início</a> > <span>Sobre Nós</span>
+    </div>
+
+    <div class="about-hero">
+        <h1>Sobre a ECAN Medicalical</h1>
+        <p>Comprometidos com a excelência em equipamentos médicos há mais de 15 anos</p>
+    </div>
+
+    <div class="content">
+        <div class="section">
+            <h2>Nossa História</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h3>2009 - Fundação</h3>
+                    <p>A ECAN Medicalical foi fundada com a missão de fornecer equipamentos médicos de alta qualidade para prestadores de cuidados de saúde em todo o mundo.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>2012 - Expansão Global</h3>
+                    <p>Iniciamos nossa expansão internacional, estabelecendo parcerias na Europa e Ásia.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>2015 - Certificações Internacionais</h3>
+                    <p>Obtivemos as certificações ISO 13485, CE e FDA, consolidando nossa posição como fabricante de classe mundial.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>2020 - Nova Fábrica</h3>
+                    <p>Inauguramos nossa moderna fábrica de 50.000 metros quadrados, aumentando significativamente nossa capacidade de produção.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>2026 - Presença Global</h3>
+                    <p>Servimos mais de 500 clientes em mais de 30 países ao redor do mundo.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Números que Falam</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>15+</h3>
+                    <p>Anos de Experiência</p>
+                </div>
+                <div class="stat-card">
+                    <h3>50.000m²</h3>
+                    <p>Fábrica</p>
+                </div>
+                <div class="stat-card">
+                    <h3>500+</h3>
+                    <p>Clientes Globais</p>
+                </div>
+                <div class="stat-card">
+                    <h3>30+</h3>
+                    <p>Países</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Nossa Fábrica</h2>
+            <p>Nossa fabricação de 50.000 metros quadrados está equipada com tecnologia de ponta e segue os mais rigorosos padrões de qualidade. Investimos continuamente em equipamentos de produção avançados e sistemas de controle de qualidade para garantir a excelência em cada produto.</p>
+            <div class="factory-gallery">
+                <div class="factory-img">🏭 Linha de Produção</div>
+                <div class="factory-img">🔬 Laboratório de Testes</div>
+                <div class="factory-img">📦 Área de Armazenamento</div>
+                <div class="factory-img">�?Sala Limpa ISO 7</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Certificações</h2>
+            <p>Nossas certificações internacionais garantem que nossos produtos atendem aos mais altos padrões de qualidade e segurança.</p>
+            <div class="cert-grid">
+                <div class="cert-card">
+                    <h4>ISO 13485:2016</h4>
+                    <p>Sistema de Gestão de Qualidade para Dispositivos Médicos</p>
+                </div>
+                <div class="cert-card">
+                    <h4>CE</h4>
+                    <p>Conformidade Europeia para Dispositivos Médicos</p>
+                </div>
+                <div class="cert-card">
+                    <h4>FDA</h4>
+                    <p>Aprovação食品药品监督管理局</p>
+                </div>
+                <div class="cert-card">
+                    <h4>RoHS</h4>
+                    <p>Restrição de Substâncias Perigosas</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Nossa Equipe</h2>
+            <p>Contamos com uma equipe de profissionais altamente qualificados, incluindo engenheiros, técnicos e especialistas em controle de qualidade.</p>
+            <div class="team-grid">
+                <div class="team-member">
+                    <h4>Equipe de P&D</h4>
+                    <p>50+ Engenheiros especializados em desenvolvimento de produtos médicos inovadores.</p>
+                </div>
+                <div class="team-member">
+                    <h4>Controle de Qualidade</h4>
+                    <p>30+ Especialistas em garantia de qualidade e testes rigorosos.</p>
+                </div>
+                <div class="team-member">
+                    <h4>Suporte Técnico</h4>
+                    <p>20+ Profissionais dedicados ao suporte pós-venda.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Nuestra Missão</h2>
+            <p>Nossa missão é melhorar a qualidade dos cuidados de saúde em todo o mundo, fornecendo equipamentos médicos confiáveis, seguros e inovadores. Comprometemo-nos a trabalhar em parceria com nossos clientes para entender suas necessidades e fornecer soluções personalizadas que superem suas expectativas.</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>ECAN Medical</h4>
+                <p>ECAN Medical (Guangzhou) - Empresa de tecnologia médica de alta tecnologia especializada em diagnóstico por ultrassom e soluções de IA para saúde feminina.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Links Rápidos</h4>
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="index.html#products">Produtos</a></li>
+                    <li><a href="sobre-nos.html">Sobre Nós</a></li>
+                    <li><a href="index.html#contact">Contato</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contato</h4>
+                <ul>
+                    <li>📧 info@ecanmed.com</li>
+                    <li>📞 +86 123 4567 8900</li>
+                    <li>📍 Shenzhen, Guangdong, China</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 ECAN Medicalical. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+</body>
+    <script>
+        function toggleMenu() {
+            document.getElementById('nav-menu').classList.toggle('active');
+        }
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('nav-menu').classList.remove('active');
+            });
+        });
+    </script>
+</html>
