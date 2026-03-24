@@ -1,0 +1,45 @@
+{
+  "site": {
+    "name": "ECAN Medical",
+    "email": "info@ecanmedical.com",
+    "phone": "+55 11 99999-9999",
+    "address": "Guangzhou, China",
+    "description": "Equipamentos médicos de última geração para diagnóstico feminino"
+  },
+  "analytics": {
+    "gaId": ""
+  },
+  "hero": {
+    "title": "Global Standards. Reliable Care.",
+    "subtitle": "Padrões Globais. Cuidado Confiável. Tecnologia avançada para diagnóstico precoce do cáncer de mama.",
+    "ctaText": "Solicitar Orçamento",
+    "secondaryText": "Saiba Mais"
+  },
+  "stats": [
+    { "number": "15+", "label": "Anos de Experiência" },
+    { "number": "50+", "label": "Países Atendidos" },
+    { "number": "1000+", "label": "Hospitais" },
+    { "number": "24/7", "label": "Suporte Técnico" }
+  ],
+  "features": [
+    { "icon": "🔬", "title": "Tecnologia Avançada", "desc": "Equipamentos de última geração com certificação internacional" },
+    { "icon": "🤖", "title": "IA Inteligente", "desc": "Software de diagnóstico com inteligência artificial" },
+    { "icon": "📱", "title": "Conectividade Cloud", "desc": "Acesso remoto e telemedicina" },
+    { "icon": "🛡️", "title": "Certificações", "desc": "FDA, CE, ISO certificados" }
+  ],
+  "about": {
+    "title": "Sobre a ECAN Medical",
+    "content": [
+      "Somos especializados em soluções de diagnóstico médico de alta qualidade para a saúde feminina.",
+      "Nossa linha de produtos inclui sistemas ABUS, diagnósticos por IA e dispositivos portáteis avançados."
+    ],
+    "certifications": ["FDA", "CE", "ISO 13485", "ANVISA"]
+  },
+  "contact": {
+    "title": "Solicite um Orçamento",
+    "subtitle": "Nossa equipe está pronta para atender você. Entre em contato!"
+  },
+  "footer": {
+    "about": "ECAN Medical - Tecnologia de ponta para diagnóstico preciso"
+  }
+}
