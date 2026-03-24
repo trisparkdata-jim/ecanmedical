@@ -1,0 +1,16 @@
+[build]
+  command = ""
+  publish = ""
+
+[build.processing]
+  skip_processing = true
+
+# Enable Netlify Identity for CMS
+[build.environment]
+  NETFLIX_IDENTITY_INSTANCE = ""
+
+# Redirect rules for CMS
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/index.html"
+  status = 200
