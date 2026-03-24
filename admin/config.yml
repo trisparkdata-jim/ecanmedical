@@ -1,0 +1,126 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images"
+public_folder: "/images"
+
+# 即将在Netlify上配置 Identity
+# publish_mode: editorial_workflow
+
+collections:
+  # ===== 网站基础设置 =====
+  - name: "site"
+    label: "Configurações do Site"
+    folder: "data"
+    create: false
+    slug: "site"
+    files:
+      - label: "Informações do Site"
+        name: "site"
+        file: "data/site.json"
+        fields:
+          - label: "Nome da Empresa"
+            name: "site.name"
+            widget: "string"
+          - label: "Email"
+            name: "site.email"
+            widget: "string"
+          - label: "Telefone"
+            name: "site.phone"
+            widget: "string"
+          - label: "Endereço"
+            name: "site.address"
+            widget: "string"
+          - label: "Descrição"
+            name: "site.description"
+            widget: "text"
+
+          - label: "Hero Section"
+            name: "hero"
+            widget: "object"
+            fields:
+              - {label: "Título", name: "title", widget: "string"}
+              - {label: " Subtítulo", name: "subtitle", widget: "text"}
+              - {label: "Botão Principal", name: "ctaText", widget: "string"}
+              - {label: "Botão Secundário", name: "secondaryText", widget: "string"}
+
+          - label: "Estatísticas"
+            name: "stats"
+            widget: "list"
+            fields:
+              - {label: "Número", name: "number", widget: "string"}
+              - {label: "Label", name: "label", widget: "string"}
+
+          - label: "Recursos/特性"
+            name: "features"
+            widget: "list"
+            fields:
+              - {label: "Ícone", name: "icon", widget: "string", hint: "例如: 🔬, 🤖, 📱"}
+              - {label: "Título", name: "title", widget: "string"}
+              - {label: "Descrição", name: "desc", widget: "text"}
+
+          - label: "Sobre Nós"
+            name: "about"
+            widget: "object"
+            fields:
+              - {label: "Título", name: "title", widget: "string"}
+              - {label: "Conteúdo (parágrafos)", name: "content", widget: "list", field: {label: "Parágrafo", widget: "text"}}
+              - {label: "Certificações", name: "certifications", widget: "list", field: {label: "Certificação", widget: "string"}}
+
+          - label: "Contato"
+            name: "contact"
+            widget: "object"
+            fields:
+              - {label: "Título", name: "title", widget: "string"}
+              - {label: " Subtítulo", name: "subtitle", widget: "text"}
+
+          - label: "Rodapé"
+            name: "footer"
+            widget: "object"
+            fields:
+              - {label: "Sobre", name: "about", widget: "text"}
+
+  # ===== 产品管理 =====
+  - name: "products"
+    label: "Produtos"
+    folder: "data"
+    create: false
+    slug: "products"
+    files:
+      - label: "Lista de Produtos"
+        name: "products"
+        file: "data/products.json"
+        fields:
+          - label: "Produtos"
+            name: "products"
+            widget: "list"
+            fields:
+              - {label: "ID", name: "id", widget: "string", hint: "唯一标识符，例如: abus"}
+              - {label: "产品代码", name: "code", widget: "string"}
+              - {label: "产品名称", name: "name", widget: "string"}
+              - {label: "简短描述", name: "shortDesc", widget: "text"}
+              - {label: "分类", name: "category", widget: "string"}
+              - {label: "图标", name: "icon", widget: "string", hint: "例如: 🔬, 🤖, 📱"}
+              - {label: "产品图片", name: "image", widget: "image"}
+              - {label: "启用", name: "enabled", widget: "boolean", default: true}
+              - label: "详细信息"
+                name: "details"
+                widget: "object"
+                fields:
+                  - {label: "产品描述", name: "description", widget: "text"}
+                  - label: "功能特点"
+                    name: "features"
+                    widget: "list"
+                    fields:
+                      - {label: "功能", name: "string", widget: "text"}
+                  - label: "规格参数"
+                    name: "specs"
+                    widget: "list"
+                    fields:
+                      - {label: "参数名", name: "label", widget: "string"}
+                      - {label: "参数值", name: "value", widget: "string"}
+
+slug:
+  encoding: "unicode"
+  clean_accents: true
