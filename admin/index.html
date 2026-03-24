@@ -1,13 +1,311 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ECAN Medical - Gerenciador de Conteúdo</title>
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECAN Medical - Painel de Administração</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #2C5F4A; --secondary: #1A3B2E; --accent: #D4AF37; --light: #f8f9fa; --white: #ffffff; --danger: #dc3545; --success: #28a745; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background: var(--light); }
+        .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); }
+        .login-box { background: var(--white); padding: 2.5rem; border-radius: 16px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .login-box h2 { color: var(--primary); text-align: center; margin-bottom: 1.5rem; font-size: 1.8rem; }
+        .login-box input { width: 100%; padding: 1rem; margin-bottom: 1rem; border: 2px solid #eee; border-radius: 10px; font-size: 1rem; }
+        .login-box button { width: 100%; padding: 1rem; background: var(--primary); color: var(--white); border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; font-weight: 600; }
+        .login-error { color: var(--danger); text-align: center; margin-bottom: 1rem; display: none; padding: 0.8rem; background: #ffeef0; border-radius: 8px; }
+        .admin-container { display: none; }
+        .admin-header { background: var(--primary); color: var(--white); padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .admin-header h1 { font-size: 1.4rem; }
+        .logout-btn { background: rgba(255,255,255,0.2); color: var(--white); padding: 0.6rem 1.2rem; border: none; border-radius: 8px; cursor: pointer; }
+        .admin-body { display: flex; min-height: calc(100vh - 60px); }
+        .sidebar { width: 260px; background: var(--white); padding: 1.5rem 0; }
+        .sidebar ul { list-style: none; }
+        .sidebar li { padding: 1rem 1.5rem; cursor: pointer; border-left: 4px solid transparent; }
+        .sidebar li:hover, .sidebar li.active { background: #f0f7f4; border-left-color: var(--primary); color: var(--primary); }
+        .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .card { background: var(--white); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; }
+        .card h3 { color: var(--primary); margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 2px solid #f0f0f0; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.8rem; border: 2px solid #eee; border-radius: 10px; }
+        .btn { padding: 0.8rem 1.5rem; border: none; border-radius: 10px; cursor: pointer; font-size: 0.95rem; font-weight: 600; }
+        .btn-primary { background: var(--primary); color: var(--white); }
+        .btn-success { background: var(--success); color: var(--white); }
+        .btn-danger { background: var(--danger); color: var(--white); }
+        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem; border: 2px solid #eee; border-radius: 12px; margin-bottom: 0.8rem; }
+        .product-item:hover { border-color: var(--primary); }
+        .product-info h4 { color: var(--primary); margin-bottom: 0.3rem; }
+        .product-code { font-family: monospace; font-size: 0.8rem; color: #888; background: var(--light); padding: 0.2rem 0.6rem; border-radius: 4px; }
+        .toggle { position: relative; width: 50px; height: 28px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.4s; border-radius: 28px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; }
+        .toggle input:checked + .toggle-slider { background-color: var(--success); }
+        .toggle input:checked + .toggle-slider:before { transform: translateX(22px); }
+        .section-content { display: none; }
+        .section-content.active { display: block; }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .loading-overlay.active { display: flex; }
+        .loading-box { background: var(--white); padding: 2rem 3rem; border-radius: 16px; text-align: center; }
+        .spinner { width: 50px; height: 50px; border: 4px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
-  <!-- Include the script that builds the page and powers Decap CMS -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <p id="loadingText">Salvando...</p>
+        </div>
+    </div>
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h2>🔐 Admin Login</h2>
+            <p class="login-error" id="loginError">Senha incorreta!</p>
+            <input type="password" id="adminPassword" placeholder="Digite a senha">
+            <button onclick="adminLogin()">Entrar</button>
+            <p style="text-align:center;margin-top:1.2rem;color:#666;">Senha: <strong>ecan2026</strong></p>
+        </div>
+    </div>
+    <div class="admin-container" id="adminPanel">
+        <div class="admin-header">
+            <h1>📊 Painel Admin - ECAN Medical</h1>
+            <div style="display:flex;gap:1rem;align-items:center;">
+                <span id="syncStatus">Pronto</span>
+                <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
+        </div>
+        <div class="admin-body">
+            <div class="sidebar">
+                <ul>
+                    <li class="active" onclick="showSection('dashboard')">📈 Dashboard</li>
+                    <li onclick="showSection('products')">📦 Produtos</li>
+                    <li onclick="showSection('site')">🌐 Site</li>
+                    <li onclick="showSection('hero')">🏠 Hero</li>
+                    <li onclick="saveAndPublish()" style="background:#d4f5e9;color:var(--primary);margin:1rem 0.5rem;border-radius:10px;">🚀 Publicar</li>
+                </ul>
+            </div>
+            <div class="main-content">
+                <div class="section-content active" id="dashboard">
+                    <div class="card">
+                        <h3>📈 Dashboard</h3>
+                        <p>Gerencie o conteúdo do site. As alterações serão publicadas automaticamente!</p>
+                        <h2 style="margin-top:1rem;color:var(--primary);" id="productCount">0</h2>
+                        <p>Produtos Ativos</p>
+                    </div>
+                </div>
+                <div class="section-content" id="products">
+                    <div class="card">
+                        <h3>📦 Produtos</h3>
+                        <div id="productList"></div>
+                        <button class="btn btn-primary" style="margin-top:1rem;" onclick="addNewProduct()">+ Novo Produto</button>
+                    </div>
+                    <div class="card" id="editProductForm" style="display:none;">
+                        <h3>✏️ Editar Produto</h3>
+                        <div id="productFormContent"></div>
+                        <div style="display:flex;gap:0.8rem;margin-top:1.5rem;">
+                            <button class="btn btn-success" onclick="saveProduct()">💾 Salvar</button>
+                            <button class="btn btn-danger" onclick="deleteProduct()">🗑️</button>
+                            <button class="btn" onclick="cancelEdit()" style="background:#eee;">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-content" id="site">
+                    <div class="card">
+                        <h3>🌐 Configurações</h3>
+                        <div class="form-group"><label>Nome da Empresa</label><input type="text" id="siteName"></div>
+                        <div class="form-group"><label>Email</label><input type="email" id="siteEmail"></div>
+                        <div class="form-group"><label>Telefone</label><input type="text" id="sitePhone"></div>
+                        <div class="form-group"><label>Endereço</label><input type="text" id="siteAddress"></div>
+                        <button class="btn btn-primary" onclick="saveSiteSettings()">💾 Salvar</button>
+                    </div>
+                </div>
+                <div class="section-content" id="hero">
+                    <div class="card">
+                        <h3>🏠 Hero</h3>
+                        <div class="form-group"><label>Título</label><input type="text" id="heroTitle"></div>
+                        <div class="form-group"><label>Subtítulo</label><textarea id="heroSubtitle"></textarea></div>
+                        <div class="form-group"><label>Botão</label><input type="text" id="heroCta"></div>
+                        <button class="btn btn-primary" onclick="saveHero()">💾 Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let siteData = {site:{name:'ECAN Medical',email:'',phone:'',address:''},hero:{title:'',subtitle:'',ctaText:''}};
+        let productsData = {products:[]};
+        let hasChanges = false;
+        let currentProductId = null;
+        
+        function saveToLocalStorage() {
+            localStorage.setItem('ecan_productsData',JSON.stringify(productsData));
+            localStorage.setItem('ecan_siteData',JSON.stringify(siteData));
+        }
+        
+        function adminLogin() {
+            if(document.getElementById('adminPassword').value==='ecan2026'){
+                document.getElementById('loginScreen').style.display='none';
+                document.getElementById('adminPanel').style.display='block';
+                initData();
+            }else{
+                document.getElementById('loginError').style.display='block';
+            }
+        }
+        function logout(){
+            document.getElementById('adminPanel').style.display='none';
+            document.getElementById('loginScreen').style.display='flex';
+        }
+        
+        async function initData(){
+            try{
+                const r = await fetch('/data/products.json');
+                if(r.ok)productsData = await r.json();
+            }catch(e){}
+            const s = localStorage.getItem('ecan_siteData');
+            if(s)siteData = JSON.parse(s);
+            renderAll();
+        }
+        
+        function renderAll(){
+            renderProducts();
+            loadFormValues();
+            document.getElementById('productCount').textContent = productsData.products.filter(p=>p.enabled).length;
+        }
+        
+        function renderProducts(){
+            document.getElementById('productList').innerHTML = productsData.products.map(p=>`
+                <div class="product-item">
+                    <div class="product-info">
+                        <h4>${p.icon} ${p.name}</h4><p>${p.shortDesc}</p>
+                        <span class="product-code">${p.code||''}</span>
+                    </div>
+                    <div class="product-actions">
+                        <label class="toggle">
+                            <input type="checkbox" ${p.enabled?'checked':''} onchange="toggleProduct('${p.id}')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <button class="btn btn-primary" onclick="editProduct('${p.id}')">✏️</button>
+                    </div>
+                </div>`).join('');
+        }
+        
+        function loadFormValues(){
+            document.getElementById('siteName').value = siteData.site.name||'';
+            document.getElementById('siteEmail').value = siteData.site.email||'';
+            document.getElementById('sitePhone').value = siteData.site.phone||'';
+            document.getElementById('siteAddress').value = siteData.site.address||'';
+            document.getElementById('heroTitle').value = siteData.hero.title||'';
+            document.getElementById('heroSubtitle').value = siteData.hero.subtitle||'';
+            document.getElementById('heroCta').value = siteData.hero.ctaText||'';
+        }
+        
+        function toggleProduct(id){
+            const p = productsData.products.find(x=>x.id===id);
+            if(p){p.enabled=!p.enabled;renderAll();saveToLocalStorage();markAsChanged();}
+        }
+        
+        function editProduct(id){
+            currentProductId = id;
+            const p = productsData.products.find(x=>x.id===id);
+            if(!p)return;
+            let imgPrev = p.image?'<img src="'+p.image+'" style="max-width:200px;margin-top:10px;">':'';
+            document.getElementById('productFormContent').innerHTML = `
+                <div class="form-group"><label>ID</label><input type="text" id="prodId" value="${p.id}"></div>
+                <div class="form-group"><label>Código</label><input type="text" id="prodCode" value="${p.code||''}"></div>
+                <div class="form-group"><label>Nome</label><input type="text" id="prodName" value="${p.name}"></div>
+                <div class="form-group"><label>Categoria</label><input type="text" id="prodCategory" value="${p.category||''}"></div>
+                <div class="form-group"><label>Descrição</label><input type="text" id="prodShortDesc" value="${p.shortDesc}"></div>
+                <div class="form-group"><label>Ícone</label><input type="text" id="prodIcon" value="${p.icon}"></div>
+                <div class="form-group"><label>Imagem</label><input type="file" onchange="handleImage(this)"><input type="hidden" id="prodImage" value="${p.image||''}">${imgPrev}</div>`;
+            document.getElementById('editProductForm').style.display='block';
+        }
+        
+        function handleImage(input){
+            if(input.files[0]){
+                const reader = new FileReader();
+                reader.onload = function(e){
+                    document.getElementById('prodImage').value = e.target.result;
+                    document.getElementById('productFormContent').querySelector('img').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function saveProduct(){
+            const p = productsData.products.find(x=>x.id===currentProductId);
+            if(p){
+                p.id = document.getElementById('prodId').value;
+                p.code = document.getElementById('prodCode').value;
+                p.name = document.getElementById('prodName').value;
+                p.category = document.getElementById('prodCategory').value;
+                p.shortDesc = document.getElementById('prodShortDesc').value;
+                p.icon = document.getElementById('prodIcon').value;
+                p.image = document.getElementById('prodImage').value;
+                saveToLocalStorage();renderAll();cancelEdit();markAsChanged();
+                alert('Salvo!');
+            }
+        }
+        
+        function deleteProduct(){
+            if(confirm('Excluir?')){
+                productsData.products = productsData.products.filter(x=>x.id!==currentProductId);
+                saveToLocalStorage();renderAll();cancelEdit();markAsChanged();
+            }
+        }
+        function cancelEdit(){document.getElementById('editProductForm').style.display='none';currentProductId=null;}
+        function addNewProduct(){
+            const id = 'p'+Date.now();
+            productsData.products.push({id,code:'',name:'Novo',shortDesc:'',category:'',icon:'📦',image:'',enabled:true,details:{description:''}});
+            renderAll();editProduct(id);markAsChanged();
+        }
+        
+        function saveSiteSettings(){
+            siteData.site.name = document.getElementById('siteName').value;
+            siteData.site.email = document.getElementById('siteEmail').value;
+            siteData.site.phone = document.getElementById('sitePhone').value;
+            siteData.site.address = document.getElementById('siteAddress').value;
+            saveToLocalStorage();markAsChanged();alert('Salvo!');
+        }
+        function saveHero(){
+            siteData.hero.title = document.getElementById('heroTitle').value;
+            siteData.hero.subtitle = document.getElementById('heroSubtitle').value;
+            siteData.hero.ctaText = document.getElementById('heroCta').value;
+            saveToLocalStorage();markAsChanged();alert('Salvo!');
+        }
+        
+        function showSection(id){
+            document.querySelectorAll('.section-content').forEach(s=>s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.sidebar li').forEach(l=>l.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        function markAsChanged(){hasChanges=true;document.getElementById('syncStatus').innerHTML='<span style="color:#fbbf24;">●</span> Alterações pendentes';}
+        
+        async function saveAndPublish(){
+            if(!hasChanges){alert('Sem alterações');return;}
+            document.getElementById('loadingOverlay').classList.add('active');
+            
+            // 保存到本地存储
+            saveToLocalStorage();
+            
+            // 下载JSON文件供手动更新
+            const siteBlob = new Blob([JSON.stringify(siteData,null,2)],{type:'application/json'});
+            const siteUrl = URL.createObjectURL(siteBlob);
+            const a = document.createElement('a');a.href=siteUrl;a.download='site.json';a.click();
+            
+            const prodBlob = new Blob([JSON.stringify(productsData,null,2)],{type:'application/json'});
+            const prodUrl = URL.createObjectURL(prodBlob);
+            const a2 = document.createElement('a');a2.href=prodUrl;a2.download='products.json';a2.click();
+            
+            document.getElementById('loadingOverlay').classList.remove('active');
+            hasChanges=false;
+            document.getElementById('syncStatus').innerHTML='<span style="color:#4ade80;">●</span> Published!';
+            
+            alert('✅ Salvo!\n\nArquivos JSON baixados. Por favor:\n1. Faça upload de products.json para pasta data/\n2. O site será atualizado automaticamente.');
+        }
+    </script>
 </body>
 </html>
