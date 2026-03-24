@@ -1,0 +1,3 @@
+# Netlify Identity redirect
+# This file allows the admin panel to work with Netlify Identity
+/admin/* /admin/index.html 200
