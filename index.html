@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECAN Medical - Global Standards. Reliable Care.</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="css/styles.css?v=20260319">
+    <script src="js/config.js?v=20260322"></script>
+    <script src="js/cms.js?v=20260322" defer></script>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo" id="site-logo">ECAN Medical</div>
+            <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="#home">Início</a></li>
+                    <li><a href="produtos.html">Produtos</a></li>
+                    <li><a href="#about">Sobre Nós</a></li>
+                    <li><a href="#contact">Contato</a></li>
+                </ul>
+            </nav>
+            <a href="#contact" class="cta-btn" id="hero-cta">Solicitar Orçamento</a>
+        </div>
+    </header>
+    
+    <script>
+        function toggleMenu() {
+            document.getElementById('nav-menu').classList.toggle('active');
+        }
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('nav-menu').classList.remove('active');
+            });
+        });
+    </script>
+
+    <section class="hero" id="home">
+        <h1 id="hero-title">Global Standards. Reliable Care.<br>Padrões Globais. Cuidado Confiável.</h1>
+        <p id="hero-subtitle">Pioneering automated breast ultrasound technology and AI-powered diagnostic solutions for early breast cancer screening</p>
+        <div class="hero-btns">
+            <a href="#contact" class="btn btn-primary" id="hero-cta-btn">Solicitar Orçamento</a>
+            <a href="produtos.html" class="btn btn-outline" id="hero-secondary">Ver Produtos</a>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-item">
+                <h3>15+</h3>
+                <p>Anos de Experiência</p>
+            </div>
+            <div class="stat-item">
+                <h3>100+</h3>
+                <p>Hospitais Parceiros</p>
+            </div>
+            <div class="stat-item">
+                <h3>30+</h3>
+                <p>Países Atendidos</p>
+            </div>
+            <div class="stat-item">
+                <h3>1M+</h3>
+                <p>Exames Realizados</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="products">
+        <div class="section-title">
+            <h2>Nossas Soluções</h2>
+            <p>Tecnologia de ponta para diagnóstico preciso</p>
+        </div>
+        <div class="products-grid" id="products-grid">
+            <!-- 产品从JSON动态加载 -->
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="features-grid" id="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Alta Precisão</h3>
+                <p>Tecnologia avançada para detecção precoce</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⏱️</div>
+                <h3>Exame Rápido</h3>
+                <p>Varredura completa em 15 minutos</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>IA Assistida</h3>
+                <p>Análise inteligente por computador</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👩‍⚕️</div>
+                <h3>Fácil Uso</h3>
+                <p>Interface intuitiva para operadores</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="about-grid">
+            <div class="about-content">
+                <h2 id="about-title">Sobre a ECAN Medical</h2>
+                <div id="about-content">
+                    <p>Fundada em 2009, a ECAN Medical é uma empresa de alta tecnologia especializada em soluções de diagnóstico por ultrassom e inteligência artificial para saúde da mulher.</p>
+                    <p>Nossa missão é melhorar a detecção precoce do câncer de mama através de tecnologia inovadora e acessível. Somos pioneiros em sistemas de ultrassom automatizado de mama (ABUS) na China.</p>
+                    <p>Com mais de 15 anos de experiência, servimos mais de 100 hospitais e clínicas em 30 países ao redor do mundo.</p>
+                </div>
+                <div class="certifications" id="certifications">
+                    <span class="cert">ISO 13485</span>
+                    <span class="cert">CE</span>
+                    <span class="cert">FDA</span>
+                    <span class="cert">NMPA</span>
+                </div>
+            </div>
+            <div class="about-stats">
+                <div style="background: white; padding: 2rem; border-radius: 10px; text-align: center;">
+                    <h3 style="color: var(--primary); font-size: 2rem;">15+</h3>
+                    <p>Anos de P&D</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 10px; text-align: center;">
+                    <h3 style="color: var(--primary); font-size: 2rem;">100+</h3>
+                    <p>Hospitais</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 10px; text-align: center;">
+                    <h3 style="color: var(--primary); font-size: 2rem;">30+</h3>
+                    <p>Países</p>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 10px; text-align: center;">
+                    <h3 style="color: var(--primary); font-size: 2rem;">1M+</h3>
+                    <p>Exames/Ano</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <div class="contact-container">
+            <h2 id="contact-title">Fale Conosco</h2>
+            <p id="contact-subtitle">Estamos prontos para fornecer soluções profissionais e orçamentos competitivos</p>
+            <div class="contact-form">
+                <form>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <input type="text" placeholder="Nome *" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="Empresa *" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="Email *" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" placeholder="Telefone (ex: +55 11 91234-5678)">
+                        </div>
+                        <div class="form-group full">
+                            <select>
+                                <option>Selecione o produto de interesse</option>
+                                <option>Sistema ABUS (Ultrassom Automatizado de Mama)</option>
+                                <option>Sistema de Diagnóstico por IA</option>
+                                <option>Ultrassom Portátil</option>
+                                <option>Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group full">
+                            <textarea placeholder="Sua mensagem *"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn">Enviar Mensagem</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>ECAN Medical</h4>
+                <p id="footer-about">Especialistas em soluções de ultrassom inteligente e diagnóstico por IA para saúde da mulher.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Links Rápidos</h4>
+                <ul>
+                    <li><a href="#home">Início</a></li>
+                    <li><a href="#products">Produtos</a></li>
+                    <li><a href="#about">Sobre Nós</a></li>
+                    <li><a href="#contact">Contato</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Produtos</h4>
+                <ul>
+                    <li><a href="#">ABUS</a></li>
+                    <li><a href="#">IA Diagnóstico</a></li>
+                    <li><a href="#">Ultrassom Portátil</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contato</h4>
+                <ul>
+                    <li>📧 info@ecanmedical.com</li>
+                    <li>📞 +86 20 1234 5678</li>
+                    <li>📍 Guangzhou, China</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 ECAN Medical. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 页面加载完成后渲染数据
+        document.addEventListener('DOMContentLoaded', async () => {
+            await CMS.renderHome();
+            // 初始化Google Analytics
+            await CMS.initAnalytics();
+        });
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 追踪表单提交事件
+            CMS.trackFormSubmit('contato_form');
+            
+            alert('Obrigado pela sua mensagem! Entraremos em contato em breve.');
+        });
+    </script>
+</body>
+</html>
