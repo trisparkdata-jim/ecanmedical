@@ -1,12 +1,10 @@
 backend:
   name: git-gateway
   branch: main
+  repo: trisparkdata-jim/ecanmedical
 
 media_folder: "images"
 public_folder: "/images"
-
-# 即将在Netlify上配置 Identity
-# publish_mode: editorial_workflow
 
 collections:
   # ===== 网站基础设置 =====
