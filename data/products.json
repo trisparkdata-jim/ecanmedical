@@ -1,0 +1,91 @@
+{
+  "products": [
+    {
+      "id": "abus",
+      "code": "ECAN-ABUS-001",
+      "name": "Sistema de Ultrassom Automatizado de Mama (ABUS)",
+      "shortDesc": "Varredura automática 3D para detecção precoce do cáncer de mama com tecnologia de ponta",
+      "category": "Diagnóstico",
+      "icon": "🔬",
+      "image": "",
+      "enabled": true,
+      "details": {
+        "description": "O sistema ABUS (Automated Breast Ultrasound) oferece varredura automática 3D da mama, permitindo detecção precoce de lesões em mulheres com tecido denso. Tecnologia专利.",
+        "features": [
+          "Varredura automática 3D de toda a mama",
+          "Visualização multiplanar (sagital, coronal, axial)",
+          "Software de análise assisted por IA",
+          "Alta taxa de detecção em tecido denso",
+          "Ergonômico e confortável para a paciente",
+          "Registro de imagem DICOM"
+        ],
+        "specs": [
+          { "label": "Frequência", "value": "6-14 MHz" },
+          { "label": "Profundidade", "value": "4-8 cm" },
+          { "label": "Tempo de varredura", "value": "~60 segundos" },
+          { "label": "Display", "value": "21.5 pol Full HD" },
+          { "label": "Dimensões", "value": "45x35x120 cm" },
+          { "label": "Peso", "value": "12 kg" }
+        ]
+      }
+    },
+    {
+      "id": "ia-diagnostico",
+      "code": "ECAN-AI-002",
+      "name": "Sistema de Diagnóstico por IA",
+      "shortDesc": "Software inteligente com aprendizado profundo para análise precisa de imagens de ultrassom",
+      "category": "Inteligência Artificial",
+      "icon": "🤖",
+      "image": "",
+      "enabled": true,
+      "details": {
+        "description": "Sistema de diagnóstico assistido por inteligência artificial que analisa imagens de ultrassom e mamografia com alta precisão, ajudando médicos a tomar decisões mais rápidas e precisas.",
+        "features": [
+          "Algoritmos de deep learning treinados com milhões de imagens",
+          "Detecção automática de nódulos e calcificações",
+          "Classificação BI-RADS automática",
+          "Comparação com exames anteriores",
+          "Relatórios automatizados",
+          "Integração com sistemas PACS"
+        ],
+        "specs": [
+          { "label": "Precisão", "value": ">95%" },
+          { "label": "Tempo de análise", "value": "<5 segundos" },
+          { "label": "Formatos suportados", "value": "DICOM, JPG, PNG" },
+          { "label": "Rede neural", "value": "CNN ResNet-50" },
+          { "label": "API", "value": "RESTful JSON" },
+          { "label": "Certificações", "value": "CE, FDA" }
+        ]
+      }
+    },
+    {
+      "id": "ultraportatil",
+      "code": "ECAN-PORT-003",
+      "name": "Ultrassom Portátil Inteligente",
+      "shortDesc": "Dispositivo handheld com conectividade cloud para teleconsulta e diagnóstico remoto",
+      "category": "Portátil",
+      "icon": "📱",
+      "image": "",
+      "enabled": true,
+      "details": {
+        "description": "Ultrassom portátil de última geração com conectividade cloud. Permite realização de exames em qualquer lugar e compartilhamento instantâneo com especialistas para teleconsulta.",
+        "features": [
+          "Design ultraleve e portátil",
+          "Conectividade 4G/5G e WiFi",
+          "Bateria de longa duração (>4 horas)",
+          "Transdutor convexo e linear",
+          "Cloud storage automático",
+          "App mobile para visualização"
+        ],
+        "specs": [
+          { "label": "Peso", "value": "<300g" },
+          { "label": "Tela", "value": "5.5 pol AMOLED" },
+          { "label": "Frequência", "value": "2-10 MHz" },
+          { "label": "Bateria", "value": "4+ horas" },
+          { "label": "Armazenamento", "value": "32GB + Cloud" },
+          { "label": "Resistência", "value": "IP67" }
+        ]
+      }
+    }
+  ]
+}
