@@ -1,0 +1,3 @@
+# 静态文件重定向
+/produtos    /   200
+/produtos/  /   200
