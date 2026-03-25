@@ -250,5 +250,25 @@ const CMS = {
     }
 };
 
+    // 自动刷新功能 - 每5秒检查更新
+    startAutoRefresh() {
+        setInterval(async () => {
+            console.log('🔄 检查数据更新...');
+            await this.renderHome();
+        }, 5000); // 5秒刷新一次
+    }
+};
+
 // 导出供其他地方使用
 window.CMS = CMS;
+
+// 页面加载后启动自动刷新
+document.addEventListener('DOMContentLoaded', () => {
+    // 延迟10秒启动，避免影响首次加载
+    setTimeout(() => {
+        if (window.CMS && window.CMS.startAutoRefresh) {
+            window.CMS.startAutoRefresh();
+            console.log('🚀 自动刷新已启动');
+        }
+    }, 10000);
+});
