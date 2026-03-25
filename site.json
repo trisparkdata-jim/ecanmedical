@@ -1,0 +1,32 @@
+{
+  "site": {
+    "name": "ECAN Medical",
+    "email": "info@ecanmedical.com",
+    "phone": "+86 20 1234 5678",
+    "address": "Guangzhou, China",
+    "description": ""
+  },
+  "analytics": {
+    "gaId": ""
+  },
+  "hero": {
+    "title": "Global Standards. Reliable Care.",
+    "subtitle": "Padrões Globais. Cuidado Confiável.",
+    "ctaText": "Solicitar Orçamento",
+    "secondaryText": "Saiba Mais"
+  },
+  "stats": [],
+  "features": [],
+  "about": {
+    "title": "",
+    "content": [],
+    "certifications": []
+  },
+  "contact": {
+    "title": "",
+    "subtitle": ""
+  },
+  "footer": {
+    "about": ""
+  }
+}
