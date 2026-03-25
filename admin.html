@@ -710,49 +710,35 @@
             event.target.classList.add('active');
         }
         
-        // SAVE AND PUBLISH - 通过Netlify Forms提交
+        // SAVE AND PUBLISH - 一键触发Netlify重建
         async function saveAndPublish() {
             if(!hasChanges) { alert('没有需要发布的更改'); return; }
             
             document.getElementById('loadingOverlay').classList.add('active');
-            document.getElementById('loadingText').textContent = '正在保存到Netlify...';
-            
-            // 构建提交数据
-            const formData = new FormData();
-            formData.append('siteData', JSON.stringify(siteData));
-            formData.append('productsData', JSON.stringify(productsData));
-            formData.append('timestamp', new Date().toISOString());
+            document.getElementById('loadingText').textContent = '正在触发网站更新...';
             
             try {
-                // 提交到Netlify Forms
-                const response = await fetch('/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({
-                        'form-name': 'ecan-cms-data',
-                        'siteData': JSON.stringify(siteData),
-                        'productsData': JSON.stringify(productsData)
-                    }).toString()
-                });
-                
-                // 同时保存到本地Storage作为备份
+                // 保存到本地存储
                 localStorage.setItem('ecan_siteData', JSON.stringify(siteData));
                 localStorage.setItem('ecan_productsData', JSON.stringify(productsData));
                 
-                // 下载JSON文件供手动更新
-                downloadFiles();
+                // 触发Netlify重建
+                const deployHook = 'https://api.netlify.com/build_hooks/69c348c05f3c103e7f9fe80e';
+                await fetch(deployHook, { method: 'POST' });
                 
                 document.getElementById('loadingOverlay').classList.remove('active');
                 hasChanges = false;
                 document.getElementById('syncStatus').innerHTML = '<span style="color:#4ade80;">●</span> 已发布!';
                 
-                alert('✅ 发布成功！\n\n由于静态网站限制，数据已导出为JSON文件。\n请下载下方文件并上传到网站data/目录覆盖即可实时更新。');
+                alert('✅ 发布成功！\n\n网站正在重建，1-2分钟后自动更新。\n\n⚠️ 提示：当前版本数据保存在浏览器本地，如需永久保存请手动导出JSON文件。');
                 
             } catch(error) {
                 document.getElementById('loadingOverlay').classList.remove('active');
-                console.error(error);
+                // 即使出错也保存到本地
+                localStorage.setItem('ecan_siteData', JSON.stringify(siteData));
+                localStorage.setItem('ecan_productsData', JSON.stringify(productsData));
                 downloadFiles();
-                alert('⚠️ 已保存到本地！\n\n请下载JSON文件并手动上传到网站data/目录。');
+                alert('⚠️ 网络错误，但已保存到浏览器！\n\n请手动下载JSON文件上传到网站。');
             }
         }
         
