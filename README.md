@@ -1,0 +1,974 @@
+[admin.html](https://github.com/user-attachments/files/26230592/admin.html)
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECAN Medical - Painel de Administração</title>
+    <!-- Netlify Forms (自动保存到Netlify) -->
+    <form name="ecan-cms-data" netlify hidden>
+        <input type="text" name="siteData">
+        <input type="text" name="productsData">
+    </form>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #2C5F4A; --secondary: #1A3B2E; --accent: #D4AF37; --light: #f8f9fa; --white: #ffffff; --danger: #dc3545; --success: #28a745; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background: var(--light); }
+        
+        /* Login Screen */
+        .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); }
+        .login-box { background: var(--white); padding: 2.5rem; border-radius: 16px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .login-box h2 { color: var(--primary); text-align: center; margin-bottom: 1.5rem; font-size: 1.8rem; }
+        .login-box input { width: 100%; padding: 1rem; margin-bottom: 1rem; border: 2px solid #eee; border-radius: 10px; font-size: 1rem; transition: border-color 0.3s; }
+        .login-box input:focus { outline: none; border-color: var(--primary); }
+        .login-box button { width: 100%; padding: 1rem; background: var(--primary); color: var(--white); border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .login-box button:hover { background: var(--secondary); transform: translateY(-2px); }
+        .login-error { color: var(--danger); text-align: center; margin-bottom: 1rem; display: none; padding: 0.8rem; background: #ffeef0; border-radius: 8px; }
+        
+        /* Admin Layout */
+        .admin-container { display: none; }
+        .admin-header { background: var(--primary); color: var(--white); padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .admin-header h1 { font-size: 1.4rem; display: flex; align-items: center; gap: 0.5rem; }
+        .header-status { display: flex; align-items: center; gap: 1rem; }
+        .sync-status { font-size: 0.85rem; opacity: 0.8; display: flex; align-items: center; gap: 0.5rem; }
+        .sync-status.synced { color: #4ade80; }
+        .sync-status.syncing { color: #fbbf24; }
+        .logout-btn { background: rgba(255,255,255,0.2); color: var(--white); padding: 0.6rem 1.2rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s; }
+        .logout-btn:hover { background: rgba(255,255,255,0.3); }
+        
+        .admin-body { display: flex; min-height: calc(100vh - 60px); }
+        .sidebar { width: 260px; background: var(--white); padding: 1.5rem 0; box-shadow: 4px 0 20px rgba(0,0,0,0.05); }
+        .sidebar ul { list-style: none; }
+        .sidebar li { padding: 1rem 1.5rem; cursor: pointer; border-left: 4px solid transparent; transition: all 0.3s; display: flex; align-items: center; gap: 0.8rem; font-weight: 500; }
+        .sidebar li:hover, .sidebar li.active { background: #f0f7f4; border-left-color: var(--primary); color: var(--primary); }
+        
+        .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+        
+        /* Cards */
+        .card { background: var(--white); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .card h3 { color: var(--primary); margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 2px solid #f0f0f0; font-size: 1.3rem; }
+        
+        /* Forms */
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #444; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8rem; border: 2px solid #eee; border-radius: 10px; font-size: 0.95rem; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+        .form-group textarea { min-height: 100px; }
+        
+        /* Buttons */
+        .btn { padding: 0.8rem 1.5rem; border: none; border-radius: 10px; cursor: pointer; font-size: 0.95rem; font-weight: 600; transition: all 0.3s; }
+        .btn-primary { background: var(--primary); color: var(--white); }
+        .btn-primary:hover { background: var(--secondary); transform: translateY(-2px); }
+        .btn-success { background: var(--success); color: var(--white); }
+        .btn-success:hover { background: #1e7e34; }
+        .btn-danger { background: var(--danger); color: var(--white); }
+        .btn-group { display: flex; gap: 0.8rem; margin-top: 1.5rem; }
+        
+        /* Product List */
+        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem; border: 2px solid #eee; border-radius: 12px; margin-bottom: 0.8rem; transition: all 0.3s; }
+        .product-item:hover { border-color: var(--primary); background: #fafdfb; }
+        .product-info h4 { color: var(--primary); margin-bottom: 0.3rem; font-size: 1.1rem; }
+        .product-info p { font-size: 0.9rem; color: #666; }
+        .product-code { font-family: monospace; font-size: 0.8rem; color: #888; background: var(--light); padding: 0.2rem 0.6rem; border-radius: 4px; }
+        .product-actions { display: flex; align-items: center; gap: 0.8rem; }
+        
+        /* Toggle Switch */
+        .toggle { position: relative; width: 50px; height: 28px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.4s; border-radius: 28px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; }
+        .toggle input:checked + .toggle-slider { background-color: var(--success); }
+        .toggle input:checked + .toggle-slider:before { transform: translateX(22px); }
+        
+        /* Sections */
+        .section-content { display: none; }
+        .section-content.active { display: block; }
+        
+        /* Alert */
+        .alert { padding: 1rem; border-radius: 10px; margin-bottom: 1rem; font-weight: 500; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        
+        /* Loading overlay */
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .loading-overlay.active { display: flex; }
+        .loading-box { background: var(--white); padding: 2rem 3rem; border-radius: 16px; text-align: center; }
+        .spinner { width: 50px; height: 50px; border: 4px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @media (max-width: 768px) {
+            .admin-body { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .product-item { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .product-actions { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <p id="loadingText">Salvando alterações...</p>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h2>🔐 Admin Login</h2>
+            <p class="login-error" id="loginError">Senha incorreta!</p>
+            <input type="password" id="adminPassword" placeholder="Digite a senha de admin">
+            <button onclick="adminLogin()">Entrar</button>
+            <p style="text-align: center; margin-top: 1.2rem; font-size: 0.9rem; color: #666;">
+                Senha padrão: <strong>ecan2026</strong>
+            </p>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-container" id="adminPanel">
+        <div class="admin-header">
+            <h1>📊 Painel de Administração - ECAN Medical</h1>
+            <div class="header-status">
+                <span class="sync-status" id="syncStatus">
+                    <span class="sync-dot">●</span> Pronto para sincronizar
+                </span>
+                <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
+        </div>
+        
+        <div class="admin-body">
+            <div class="sidebar">
+                <ul>
+                    <li class="active" onclick="showSection('dashboard')">📈 Dashboard</li>
+                    <li onclick="showSection('site')">🌐 Configurações do Site</li>
+                    <li onclick="showSection('products')">📦 Gerenciar Produtos</li>
+                    <li onclick="showSection('hero')">🏠 Seção Hero</li>
+                    <li onclick="showSection('stats')">📊 Estatísticas</li>
+                    <li onclick="showSection('features')">✨ Características</li>
+                    <li onclick="showSection('about')">ℹ️ Sobre Nós</li>
+                    <li onclick="showSection('contact')">📧 Seção Contato</li>
+                    <li onclick="showSection('footer')">🔻 Rodapé</li>
+                    <li onclick="showSection('cloud')">☁️ Sincronização na Nuvem</li>
+                    <li onclick="saveToCloud()" style="background: #28a745; color: white; margin: 1rem 0.5rem; border-radius: 10px;">💾 Salvar na Nuvem</li>
+                    <li onclick="publish()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin: 0.5rem; border-radius: 10px; font-weight: bold;">🚀 Publicar Site</li>
+                </ul>
+            </div>
+            
+            <div class="main-content">
+                <!-- Cloud Sync Section -->
+                <div class="section-content" id="cloud">
+                    <div class="card">
+                        <h3>☁️ Configuração de Sincronização na Nuvem</h3>
+                        <div class="alert alert-success">
+                            <p><strong>🎯 Como funciona:</strong> Configure a integração com JSONBin.io para salvar conteúdo automaticamente. 
+                            Após configurar, clique em "💾 Salvar na Nuvem" para publicar as alterações instantaneamente!</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>🔑 API Key (JSONBin.io)</label>
+                            <input type="password" id="cloudApiKey" placeholder="Cole sua API Key aqui">
+                            <small style="color:#666;">Obtha em: <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> (Gratuito)</small>
+                        </div>
+                        <div class="form-group">
+                            <label>📂 Bin ID (JSONBin.io)</label>
+                            <input type="text" id="cloudBinId" placeholder="Ex: 65f2xxxxx...">
+                            <small style="color:#666;">Crie um novo Bin no JSONBin.io e cole o ID aqui</small>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveCloudConfig()">💾 Salvar Configuração</button>
+                        <button class="btn" onclick="testCloudConnection()" style="background: #6c757d; color: white; margin-left: 10px;">🔍 Testar Conexão</button>
+                        
+                        <hr style="margin: 2rem 0;">
+                        
+                        <div class="alert" style="background: #e7f3ff; border: 1px solid #b6d4fe; padding: 1rem; border-radius: 8px;">
+                            <p><strong>🔗 Netlify Deploy Hook (Opcional)</strong></p>
+                            <p style="font-size: 0.9rem; color: #666;">Configure para atualizar o site automaticamente após salvar na nuvem.</p>
+                            <div class="form-group" style="margin-top: 1rem;">
+                                <label>🔗 Deploy Hook URL</label>
+                                <input type="text" id="deployHookUrl" placeholder="https://api.netlify.com/build_hooks/xxxxx">
+                                <small style="color:#666;">Netlify > Site settings > Build & deploy > Build hooks</small>
+                            </div>
+                            <button class="btn btn-primary" onclick="saveDeployHook()">💾 Salvar Hook</button>
+                        </div>
+                        
+                        <hr style="margin: 2rem 0;">
+                        
+                        <div class="form-group">
+                            <label><strong>📋 Guia de Configuração:</strong></label>
+                            <ol style="margin-top: 1rem; padding-left: 1.5rem; line-height: 2;">
+                                <li>Acesse <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> e crie uma conta gratuita</li>
+                                <li>Crie um novo Bin (Private) e copie o ID do bin (ex: 65f2xxxxx...)</li>
+                                <li>Vá em "Master Key" e copie sua API Key</li>
+                                <li>Cole o Bin ID e API Key acima e clique em "Salvar Configuração"</li>
+                                <li>Pronto! Agora clique em "💾 Salvar na Nuvem" para publicar!</li>
+                            </ol>
+                        </div>
+                        
+                        <div id="cloudTestResult" style="margin-top: 1rem;"></div>
+                    </div>
+                </div>
+                
+                <!-- Dashboard -->
+                <div class="section-content active" id="dashboard">
+                    <div class="card">
+                        <h3>📈 Bem-vindo ao Painel Admin</h3>
+                        <p>Gerencie todo o conteúdo do site. As alterações serão publicadas automaticamente!</p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+                            <div style="background: var(--light); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                                <h2 style="color: var(--primary); font-size: 2rem;" id="productCount">3</h2>
+                                <p>Produtos Ativos</p>
+                            </div>
+                            <div style="background: var(--light); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                                <h2 style="color: var(--success); font-size: 2rem;">🟢</h2>
+                                <p>Sistema Online</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products Section -->
+                <div class="section-content" id="products">
+                    <div class="card">
+                        <h3>📦 Gerenciar Produtos</h3>
+                        <div id="productList"></div>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" onclick="addNewProduct()">+ Adicionar Novo Produto</button>
+                    </div>
+                    
+                    <!-- Edit Product Form -->
+                    <div class="card" id="editProductForm" style="display: none;">
+                        <h3>✏️ Editar Produto</h3>
+                        <div id="productFormContent"></div>
+                        <div class="btn-group">
+                            <button class="btn btn-success" onclick="saveProduct()">💾 Salvar</button>
+                            <button class="btn btn-danger" onclick="deleteProduct()">🗑️ Excluir</button>
+                            <button class="btn" onclick="cancelEdit()" style="background: #eee;">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Site Settings -->
+                <div class="section-content" id="site">
+                    <div class="card">
+                        <h3>🌐 Configurações Gerais do Site</h3>
+                        <div class="form-group">
+                            <label>Nome da Empresa</label>
+                            <input type="text" id="siteName">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="siteEmail">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="text" id="sitePhone">
+                        </div>
+                        <div class="form-group">
+                            <label>Endereço</label>
+                            <input type="text" id="siteAddress">
+                        </div>
+                        <div class="form-group">
+                            <label>📊 Google Analytics 4 ID (G-XXXXXXXXXX)</label>
+                            <input type="text" id="siteGaId" placeholder="G-XXXXXXXXXX">
+                            <small style="color:#666;">Exemplo: G-XY1234567</small>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSiteSettings()">💾 Salvar</button>
+                    </div>
+                </div>
+                
+                <!-- Hero Section -->
+                <div class="section-content" id="hero">
+                    <div class="card">
+                        <h3>🏠 Seção Hero</h3>
+                        <div class="form-group">
+                            <label>Título Principal</label>
+                            <input type="text" id="heroTitle">
+                        </div>
+                        <div class="form-group">
+                            <label>Subtítulo</label>
+                            <textarea id="heroSubtitle"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Texto do Botão Principal</label>
+                            <input type="text" id="heroCta">
+                        </div>
+                        <div class="form-group">
+                            <label>Texto do Botão Secundário</label>
+                            <input type="text" id="heroSecondary">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveHero()">💾 Salvar</button>
+                    </div>
+                </div>
+                
+                <!-- Stats Section -->
+                <div class="section-content" id="stats">
+                    <div class="card">
+                        <h3>📊 Estatísticas</h3>
+                        <div id="statsList"></div>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" onclick="addStat()">+ Adicionar</button>
+                    </div>
+                </div>
+                
+                <!-- Features Section -->
+                <div class="section-content" id="features">
+                    <div class="card">
+                        <h3>✨ Características</h3>
+                        <div id="featuresList"></div>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" onclick="addFeature()">+ Adicionar</button>
+                    </div>
+                </div>
+                
+                <!-- About Section -->
+                <div class="section-content" id="about">
+                    <div class="card">
+                        <h3>ℹ️ Sobre Nós</h3>
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" id="aboutTitle">
+                        </div>
+                        <div class="form-group">
+                            <label>Parágrafo 1</label>
+                            <textarea id="aboutP1"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Parágrafo 2</label>
+                            <textarea id="aboutP2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Certificações (vírgula)</label>
+                            <input type="text" id="aboutCerts">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveAbout()">💾 Salvar</button>
+                    </div>
+                </div>
+                
+                <!-- Contact Section -->
+                <div class="section-content" id="contact">
+                    <div class="card">
+                        <h3>📧 Seção Contato</h3>
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" id="contactTitle">
+                        </div>
+                        <div class="form-group">
+                            <label>Subtítulo</label>
+                            <textarea id="contactSubtitle"></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveContact()">💾 Salvar</button>
+                    </div>
+                </div>
+                
+                <!-- Footer Section -->
+                <div class="section-content" id="footer">
+                    <div class="card">
+                        <h3>🔻 Rodapé</h3>
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <textarea id="footerAbout"></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveFooter()">💾 Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let siteData = { site: { name: 'ECAN Medical', email: 'info@ecanmedical.com', phone: '+86 20 1234 5678', address: 'Guangzhou, China', description: '' }, hero: { title: '', subtitle: '', ctaText: '', secondaryText: '' }, stats: [], features: [], about: { title: '', content: [], certifications: [] }, contact: { title: '', subtitle: '' }, footer: { about: '' } };
+        // 优先从 localStorage 读取，如果没有则用默认数据
+        let productsData = localStorage.getItem('ecan_productsData') 
+            ? JSON.parse(localStorage.getItem('ecan_productsData'))
+            : { 
+            products: [
+                {
+                    id: "abus", code: "ECAN-ABUS-001", name: "Sistema de Ultrassom ABUS", shortDesc: "Ultrassom automatizado de mama", category: "Diagnóstico", icon: "🔬", image: "", enabled: true,
+                    details: { description: "Sistema ABUS", features: [], specs: [] }
+                },
+                {
+                    id: "ia-diagnostico", code: "ECAN-AI-002", name: "Sistema de IA", shortDesc: "Diagnóstico por inteligência artificial", category: "IA", icon: "🤖", image: "", enabled: true,
+                    details: { description: "Sistema de IA", features: [], specs: [] }
+                },
+                {
+                    id: "ultraportatil", code: "ECAN-PORT-003", name: "Ultrassom Portátil", shortDesc: "Dispositivo handheld", category: "Portátil", icon: "📱", image: "", enabled: true,
+                    details: { description: "Ultrassom portátil", features: [], specs: [] }
+                }
+            ]
+        };
+
+        // 保存到 localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('ecan_productsData', JSON.stringify(productsData));
+            console.log('数据已保存到浏览器本地存储');
+        }
+        let currentProductId = null;
+        let hasChanges = false;
+        
+        // Login
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === 'ecan2026') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                initData();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+        
+        // Logout
+        function logout() {
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('adminPassword').value = '';
+        }
+        
+        // 初始化数据 - 优先从 localStorage 读取
+        function initData() {
+            // 优先从本地存储读取
+            const savedProducts = localStorage.getItem('ecan_productsData');
+            if (savedProducts) {
+                try {
+                    productsData = JSON.parse(savedProducts);
+                    console.log('从本地存储加载产品数据');
+                } catch(e) {
+                    console.log('本地存储数据解析失败，使用默认数据');
+                }
+            } else {
+                console.log('使用默认产品数据');
+                saveToLocalStorage(); // 首次保存默认数据
+            }
+            
+            // 站点数据
+            const savedSite = localStorage.getItem('ecan_siteData');
+            if (savedSite) {
+                try {
+                    siteData = JSON.parse(savedSite);
+                } catch(e) {}
+            }
+            
+            renderAll();
+        }
+        
+        function renderAll() {
+            renderProducts();
+            renderStats();
+            renderFeatures();
+            loadFormValues();
+            document.getElementById('productCount').textContent = productsData.products.filter(p => p.enabled).length;
+        }
+        
+        function renderProducts() {
+            const list = document.getElementById('productList');
+            list.innerHTML = productsData.products.map(p => `
+                <div class="product-item">
+                    <div class="product-info">
+                        <h4>${p.icon} ${p.name}</h4>
+                        <p>${p.shortDesc}</p>
+                        <span class="product-code">${p.code || 'SEM CÓDIGO'}</span>
+                    </div>
+                    <div class="product-actions">
+                        <label class="toggle">
+                            <input type="checkbox" ${p.enabled ? 'checked' : ''} onchange="toggleProduct('${p.id}')">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <button class="btn btn-primary" onclick="editProduct('${p.id}')">✏️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderStats() {
+            document.getElementById('statsList').innerHTML = siteData.stats.map((s, i) => `
+                <div class="product-item">
+                    <div class="product-info"><h4>#${i+1}: ${s.number} - ${s.label}</h4></div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" onclick="editStat(${i})">✏️</button>
+                        <button class="btn btn-danger" onclick="removeStat(${i})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderFeatures() {
+            document.getElementById('featuresList').innerHTML = siteData.features.map((f, i) => `
+                <div class="product-item">
+                    <div class="product-info"><h4>${f.icon} ${f.title}</h4><p>${f.desc}</p></div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" onclick="editFeature(${i})">✏️</button>
+                        <button class="btn btn-danger" onclick="removeFeature(${i})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function loadFormValues() {
+            document.getElementById('siteName').value = siteData.site.name;
+            document.getElementById('siteEmail').value = siteData.site.email;
+            document.getElementById('sitePhone').value = siteData.site.phone;
+            document.getElementById('siteAddress').value = siteData.site.address;
+            document.getElementById('siteGaId').value = siteData.analytics?.gaId || '';
+            document.getElementById('heroTitle').value = siteData.hero.title;
+            document.getElementById('heroSubtitle').value = siteData.hero.subtitle;
+            document.getElementById('heroCta').value = siteData.hero.ctaText;
+            document.getElementById('heroSecondary').value = siteData.hero.secondaryText;
+            document.getElementById('aboutTitle').value = siteData.about.title;
+            if(siteData.about.content[0]) document.getElementById('aboutP1').value = siteData.about.content[0];
+            if(siteData.about.content[1]) document.getElementById('aboutP2').value = siteData.about.content[1];
+            document.getElementById('aboutCerts').value = siteData.about.certifications.join(', ');
+            document.getElementById('contactTitle').value = siteData.contact.title;
+            document.getElementById('contactSubtitle').value = siteData.contact.subtitle;
+            document.getElementById('footerAbout').value = siteData.footer.about;
+        }
+        
+        function markAsChanged() {
+            hasChanges = true;
+            document.getElementById('syncStatus').innerHTML = '<span style="color:#fbbf24;">●</span> Alterações pendentes';
+        }
+        
+        // Save functions
+        function saveSiteSettings() {
+            siteData.site.name = document.getElementById('siteName').value;
+            siteData.site.email = document.getElementById('siteEmail').value;
+            siteData.site.phone = document.getElementById('sitePhone').value;
+            siteData.site.address = document.getElementById('siteAddress').value;
+            siteData.analytics = siteData.analytics || {};
+            siteData.analytics.gaId = document.getElementById('siteGaId').value;
+            markAsChanged();
+            alert('✅ Salvo! Clique em "🚀 Publicar Alterações" para atualizar o site.');
+        }
+        
+        function saveHero() {
+            siteData.hero.title = document.getElementById('heroTitle').value;
+            siteData.hero.subtitle = document.getElementById('heroSubtitle').value;
+            siteData.hero.ctaText = document.getElementById('heroCta').value;
+            siteData.hero.secondaryText = document.getElementById('heroSecondary').value;
+            markAsChanged();
+            alert('✅ Salvo! Clique em "🚀 Publicar Alterações" para atualizar o site.');
+        }
+        
+        function saveAbout() {
+            siteData.about.title = document.getElementById('aboutTitle').value;
+            siteData.about.content = [document.getElementById('aboutP1').value, document.getElementById('aboutP2').value];
+            siteData.about.certifications = document.getElementById('aboutCerts').value.split(',').map(s => s.trim());
+            markAsChanged();
+            alert('✅ Salvo! Clique em "🚀 Publicar Alterações" para atualizar o site.');
+        }
+        
+        function saveContact() {
+            siteData.contact.title = document.getElementById('contactTitle').value;
+            siteData.contact.subtitle = document.getElementById('contactSubtitle').value;
+            markAsChanged();
+            alert('✅ Salvo! Clique em "🚀 Publicar Alterações" para atualizar o site.');
+        }
+        
+        function saveFooter() {
+            siteData.footer.about = document.getElementById('footerAbout').value;
+            markAsChanged();
+            alert('✅ Salvo! Clique em "🚀 Publicar Alterações" para atualizar o site.');
+        }
+        
+        // Stats & Features
+        function editStat(index) {
+            const s = siteData.stats[index];
+            const n = prompt('Número:', s.number);
+            if(n) { s.number = n; s.label = prompt('Label:', s.label) || s.label; renderStats(); markAsChanged(); }
+        }
+        function removeStat(index) { siteData.stats.splice(index, 1); renderStats(); markAsChanged(); }
+        function addStat() { siteData.stats.push({ number: '0+', label: 'Novo' }); renderStats(); markAsChanged(); }
+        
+        function editFeature(index) {
+            const f = siteData.features[index];
+            f.icon = prompt('Icone:', f.icon) || f.icon;
+            f.title = prompt('Título:', f.title) || f.title;
+            f.desc = prompt('Descrição:', f.desc) || f.desc;
+            renderFeatures(); markAsChanged();
+        }
+        function removeFeature(index) { siteData.features.splice(index, 1); renderFeatures(); markAsChanged(); }
+        function addFeature() { siteData.features.push({ icon: '⭐', title: 'Novo', desc: 'Descrição' }); renderFeatures(); markAsChanged(); }
+        
+        // Products
+        function toggleProduct(id) {
+            const p = productsData.products.find(x => x.id === id);
+            if(p) { p.enabled = !p.enabled; document.getElementById('productCount').textContent = productsData.products.filter(x => x.enabled).length; markAsChanged(); }
+        }
+        
+        function editProduct(id) {
+            currentProductId = id;
+            const p = productsData.products.find(x => x.id === id);
+            if(!p) return;
+            
+            // 生成图片上传HTML
+            let imagePreview = '';
+            if(p.image && p.image.startsWith('data:')) {
+                imagePreview = `<div id="imagePreview" style="margin-top:10px;"><img src="${p.image}" style="max-width:200px;border-radius:8px;"></div>`;
+            } else if(p.image) {
+                imagePreview = `<div id="imagePreview" style="margin-top:10px;"><img src="${p.image}" style="max-width:200px;border-radius:8px;"></div>`;
+            } else {
+                imagePreview = `<div id="imagePreview" style="margin-top:10px;padding:20px;background:#f5f5f5;border-radius:8px;text-align:center;color:#999;">Nenhuma imagem</div>`;
+            }
+            
+            document.getElementById('productFormContent').innerHTML = `
+                <div class="form-group">
+                    <label>ID do Produto (URLslug)</label>
+                    <input type="text" id="prodId" value="${p.id}" placeholder="Ex: abus, ia-diagnostico">
+                    <small style="color:#666;">ID usado na URL: produto-{ID}.html</small>
+                </div>
+                <div class="form-group"><label>Código (SKU)</label><input type="text" id="prodCode" value="${p.code||''}"></div>
+                <div class="form-group"><label>Nome</label><input type="text" id="prodName" value="${p.name}"></div>
+                <div class="form-group"><label>Categoria</label><input type="text" id="prodCategory" value="${p.category||''}"></div>
+                <div class="form-group"><label>Descrição Curta</label><input type="text" id="prodShortDesc" value="${p.shortDesc}"></div>
+                <div class="form-group"><label>Ícone (emoji)</label><input type="text" id="prodIcon" value="${p.icon}"></div>
+                <div class="form-group">
+                    <label>Imagem do Produto</label>
+                    <div id="imageUploadArea" style="border:2px dashed #ccc;padding:20px;text-align:center;border-radius:10px;cursor:pointer;transition:all 0.3s;" onclick="document.getElementById('prodImageFile').click()">
+                        <p style="margin:0;color:#666;">📁 Clique para selecionar ou arraste a imagem aqui</p>
+                        <p style="margin:5px 0 0;font-size:12px;color:#999;">JPG, PNG - Máximo 2MB</p>
+                    </div>
+                    <input type="file" id="prodImageFile" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
+                    <input type="hidden" id="prodImage" value="${p.image||''}">
+                    ${imagePreview}
+                </div>
+                <div class="form-group"><label>Descrição</label><textarea id="prodDesc" rows="4">${p.details.description}</textarea></div>
+            `;
+            document.getElementById('editProductForm').style.display = 'block';
+            
+            // 拖拽上传
+            const uploadArea = document.getElementById('imageUploadArea');
+            uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.style.borderColor = '#2C5F4A'; uploadArea.style.background = '#f0f7f4'; });
+            uploadArea.addEventListener('dragleave', e => { e.preventDefault(); uploadArea.style.borderColor = '#ccc'; uploadArea.style.background = 'transparent'; });
+            uploadArea.addEventListener('drop', e => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#ccc';
+                uploadArea.style.background = 'transparent';
+                const file = e.dataTransfer.files[0];
+                if(file) processImageFile(file);
+            });
+        }
+        
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if(file) processImageFile(file);
+        }
+        
+        function processImageFile(file) {
+            if(file.size > 2*1024*1024) { alert('Imagem muito grande! Máximo 2MB'); return; }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                document.getElementById('prodImage').value = base64;
+                document.getElementById('imagePreview').innerHTML = '<img src="' + base64 + '" style="max-width:200px;border-radius:8px;">';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function saveProduct() {
+            const oldId = currentProductId;
+            const newId = document.getElementById('prodId').value.trim();
+            const p = productsData.products.find(x => x.id === oldId);
+            if(p) {
+                if (newId && newId !== oldId) {
+                    p.id = newId;
+                    currentProductId = newId;
+                }
+                p.code = document.getElementById('prodCode').value;
+                p.name = document.getElementById('prodName').value;
+                p.category = document.getElementById('prodCategory').value;
+                p.shortDesc = document.getElementById('prodShortDesc').value;
+                p.icon = document.getElementById('prodIcon').value;
+                p.image = document.getElementById('prodImage').value;
+                p.details.description = document.getElementById('prodDesc').value;
+                
+                saveToLocalStorage(); // 保存到本地存储
+                renderProducts(); cancelEdit(); markAsChanged();
+                alert('✅ Salvo! Os dados foram salvos no navegador.');
+            }
+        }
+        
+        function deleteProduct() {
+            if(confirm('Excluir?')) {
+                productsData.products = productsData.products.filter(x => x.id !== currentProductId);
+                renderProducts(); cancelEdit(); markAsChanged();
+                document.getElementById('productCount').textContent = productsData.products.filter(x => x.enabled).length;
+            }
+        }
+        
+        function cancelEdit() { document.getElementById('editProductForm').style.display = 'none'; currentProductId = null; }
+        
+        function addNewProduct() {
+            const newId = 'product-' + Date.now();
+            productsData.products.push({
+                id: newId, code: 'ECAN-'+Math.floor(Math.random()*1000), name: 'Novo Produto', shortDesc: 'Descrição', category: 'Diagnóstico', icon: '📦', image: '', enabled: true,
+                details: { description: 'Descrição', features: [], specs: [] }
+            });
+            renderProducts(); editProduct(newId); markAsChanged();
+        }
+        
+        // Show section
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.sidebar li').forEach(l => l.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        // SAVE AND PUBLISH - 通过Netlify Forms提交
+        async function saveAndPublish() {
+            if(!hasChanges) { alert('没有需要发布的更改'); return; }
+            
+            document.getElementById('loadingOverlay').classList.add('active');
+            document.getElementById('loadingText').textContent = '正在保存到Netlify...';
+            
+            // 构建提交数据
+            const formData = new FormData();
+            formData.append('siteData', JSON.stringify(siteData));
+            formData.append('productsData', JSON.stringify(productsData));
+            formData.append('timestamp', new Date().toISOString());
+            
+            try {
+                // 提交到Netlify Forms
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        'form-name': 'ecan-cms-data',
+                        'siteData': JSON.stringify(siteData),
+                        'productsData': JSON.stringify(productsData)
+                    }).toString()
+                });
+                
+                // 同时保存到本地Storage作为备份
+                localStorage.setItem('ecan_siteData', JSON.stringify(siteData));
+                localStorage.setItem('ecan_productsData', JSON.stringify(productsData));
+                
+                // 下载JSON文件供手动更新
+                downloadFiles();
+                
+                document.getElementById('loadingOverlay').classList.remove('active');
+                hasChanges = false;
+                document.getElementById('syncStatus').innerHTML = '<span style="color:#4ade80;">●</span> 已发布!';
+                
+                alert('✅ 发布成功！\n\n由于静态网站限制，数据已导出为JSON文件。\n请下载下方文件并上传到网站data/目录覆盖即可实时更新。');
+                
+            } catch(error) {
+                document.getElementById('loadingOverlay').classList.remove('active');
+                console.error(error);
+                downloadFiles();
+                alert('⚠️ 已保存到本地！\n\n请下载JSON文件并手动上传到网站data/目录。');
+            }
+        }
+        
+        // 下载JSON文件
+        function downloadFiles() {
+            // 下载site.json
+            const siteBlob = new Blob([JSON.stringify(siteData, null, 2)], {type: 'application/json'});
+            const siteUrl = URL.createObjectURL(siteBlob);
+            const siteA = document.createElement('a');
+            siteA.href = siteUrl;
+            siteA.download = 'site.json';
+            siteA.click();
+            
+            // 下载products.json
+            const prodBlob = new Blob([JSON.stringify(productsData, null, 2)], {type: 'application/json'});
+            const prodUrl = URL.createObjectURL(prodBlob);
+            const prodA = document.createElement('a');
+            prodA.href = prodUrl;
+            prodA.download = 'products.json';
+            prodA.click();
+        }
+        
+        // ==================== 云端同步功能 ====================
+        
+        // 保存云端配置
+        function saveCloudConfig() {
+            const apiKey = document.getElementById('cloudApiKey').value.trim();
+            const binId = document.getElementById('cloudBinId').value.trim();
+            
+            if (!apiKey || !binId) {
+                alert('⚠️ Por favor, preencha todos os campos!');
+                return;
+            }
+            
+            localStorage.setItem('ecan_cloudApiKey', apiKey);
+            localStorage.setItem('ecan_cloudBinId', binId);
+            
+            // 同时保存到当前变量供当前会话使用
+            window.cloudConfig = { apiKey, binId };
+            
+            alert('✅ Configuração salva! Agora você pode usar "Salvar na Nuvem" para publicar.');
+        }
+        
+        // 测试云端连接
+        async function testCloudConnection() {
+            const apiKey = localStorage.getItem('ecan_cloudApiKey') || document.getElementById('cloudApiKey').value.trim();
+            const binId = localStorage.getItem('ecan_cloudBinId') || document.getElementById('cloudBinId').value.trim();
+            
+            if (!apiKey || !binId) {
+                alert('⚠️ Configure primeiro a API Key e Bin ID!');
+                return;
+            }
+            
+            document.getElementById('loadingOverlay').classList.add('active');
+            document.getElementById('loadingText').textContent = 'Testando conexão...';
+            
+            try {
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+                    headers: { 'X-Access-Key': apiKey }
+                });
+                
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('cloudTestResult').innerHTML = 
+                        '<div class="alert alert-success">✅ Conexão bem-sucedida! Dados ditemukan: ' + Object.keys(data.record).join(', ') + '</div>';
+                } else {
+                    document.getElementById('cloudTestResult').innerHTML = 
+                        '<div class="alert" style="background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;">❌ Erro: ' + response.status + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('loadingOverlay').classList.remove('active');
+                document.getElementById('cloudTestResult').innerHTML = 
+                    '<div class="alert" style="background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;">❌ Erro de conexão: ' + error.message + '</div>';
+            }
+        }
+        
+        // 保存到云端 - 核心功能！
+        async function saveToCloud() {
+            const apiKey = localStorage.getItem('ecan_cloudApiKey');
+            const binId = localStorage.getItem('ecan_cloudBinId');
+            
+            if (!apiKey || !binId) {
+                alert('⚠️ Configure primeiro a sincronização na nuvem!\nVá na aba "☁️ Sincronização na Nuvem"');
+                showSection('cloud');
+                return;
+            }
+            
+            document.getElementById('loadingOverlay').classList.add('active');
+            document.getElementById('loadingText').textContent = 'Salvando na nuvem...';
+            
+            // 准备合并数据
+            const cloudData = {
+                site: siteData,
+                products: productsData,
+                lastUpdate: new Date().toISOString()
+            };
+            
+            try {
+                // 保存到 JSONBin.io
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Access-Key': apiKey
+                    },
+                    body: JSON.stringify(cloudData)
+                });
+                
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                if (response.ok) {
+                    hasChanges = false;
+                    document.getElementById('syncStatus').innerHTML = '<span style="color:#4ade80;">●</span> Sincronizado na nuvem!';
+                    alert('✅ Sucesso! As alterações foram salvas na nuvem.\n\nO site já está atualizado automaticamente!');
+                } else {
+                    const errorText = await response.text();
+                    alert('❌ Erro ao salvar: ' + errorText);
+                }
+            } catch (error) {
+                document.getElementById('loadingOverlay').classList.remove('active');
+                alert('❌ Erro de conexão: ' + error.message);
+            }
+        }
+        
+        // 页面加载时自动读取云端配置
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedApiKey = localStorage.getItem('ecan_cloudApiKey');
+            const savedBinId = localStorage.getItem('ecan_cloudBinId');
+            const savedDeployHook = localStorage.getItem('ecan_deployHookUrl');
+            
+            if (savedApiKey) document.getElementById('cloudApiKey').value = savedApiKey;
+            if (savedBinId) document.getElementById('cloudBinId').value = savedBinId;
+            if (savedDeployHook) document.getElementById('deployHookUrl').value = savedDeployHook;
+            
+            if (savedApiKey && savedBinId) {
+                document.getElementById('syncStatus').innerHTML = '<span style="color:#4ade80;">●</span> ☁️ Nuvem configurada';
+            }
+        });
+        
+        // 保存 Deploy Hook 配置
+        function saveDeployHook() {
+            const hookUrl = document.getElementById('deployHookUrl').value.trim();
+            if (!hookUrl) {
+                alert('⚠️ Por favor, insira a URL do Deploy Hook!');
+                return;
+            }
+            localStorage.setItem('ecan_deployHookUrl', hookUrl);
+            alert('✅ Deploy Hook salvo! Agora você pode usar "🚀 Publicar Site" para atualizar automaticamente.');
+        }
+        
+        // 一键发布 - 核心功能！
+        async function publish() {
+            const apiKey = localStorage.getItem('ecan_cloudApiKey');
+            const binId = localStorage.getItem('ecan_cloudBinId');
+            const deployHook = localStorage.getItem('ecan_deployHookUrl');
+            
+            // 检查配置
+            if (!apiKey || !binId) {
+                alert('⚠️ Configure primeiro a sincronização na nuvem!\nVá na aba "☁️ Sincronização na Nuvem"');
+                showSection('cloud');
+                return;
+            }
+            
+            if (!deployHook) {
+                alert('⚠️ Configure o Deploy Hook!\nVá na aba "☁️ Sincronização na Nuvem" e adicione a URL do Deploy Hook.');
+                showSection('cloud');
+                return;
+            }
+            
+            document.getElementById('loadingOverlay').classList.add('active');
+            document.getElementById('loadingText').textContent = '🚀 Publicando...';
+            
+            // 准备数据
+            const cloudData = {
+                site: siteData,
+                products: productsData,
+                lastUpdate: new Date().toISOString()
+            };
+            
+            try {
+                // 1. 保存到云端
+                document.getElementById('loadingText').textContent = '☁️ Salvando na nuvem...';
+                const saveResponse = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Access-Key': apiKey
+                    },
+                    body: JSON.stringify(cloudData)
+                });
+                
+                if (!saveResponse.ok) {
+                    throw new Error('Erro ao salvar na nuvem');
+                }
+                
+                // 2. 触发 Netlify 重新构建
+                document.getElementById('loadingText').textContent = '🔄 Triggering rebuild...';
+                const hookResponse = await fetch(deployHook, {
+                    method: 'POST'
+                });
+                
+                document.getElementById('loadingOverlay').classList.remove('active');
+                
+                hasChanges = false;
+                document.getElementById('syncStatus').innerHTML = '<span style="color:#4ade80;">●</span> ✅ Published!';
+                
+                alert('✅ Publish completo!\n\n1. ✅ Dados salvos na nuvem\n2. ✅ Rebuild do site iniciado\n\nO site será atualizado em 1-2 minutos.');
+                
+            } catch (error) {
+                document.getElementById('loadingOverlay').classList.remove('active');
+                alert('❌ Erro: ' + error.message + '\n\nTente novamente ou verifique as configurações.');
+            }
+        }
+    </script>
+</body>
+</html>
