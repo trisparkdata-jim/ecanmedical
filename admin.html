@@ -723,7 +723,7 @@
                 localStorage.setItem('ecan_productsData', JSON.stringify(productsData));
                 
                 // 触发Netlify重建
-                const deployHook = 'https://api.netlify.com/build_hooks/69c348c05f3c103e7f9fe80e';
+                const deployHook = 'https://api.netlify.com/build_hooks/69c35765dac72b5541949ebb';
                 await fetch(deployHook, { method: 'POST' });
                 
                 document.getElementById('loadingOverlay').classList.remove('active');
